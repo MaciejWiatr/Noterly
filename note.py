@@ -12,9 +12,6 @@ DEFAULT_NOTE_FOLDER = os.path.join(FILE_LOCATION, 'notes')
 DEFAULT_EDITOR = "code"
 
 
-
-
-
 class Note():
     def __init__(self):
         self.commands = {
@@ -40,59 +37,57 @@ class Note():
             'dnt_exist': 'That file doesnt exist'
         }
 
-    def open_file(self,args):
+    def open_file(self, args):
         file_name = args[-1]
         file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
 
         for a in args:
             if '--dir' in a:
-                folder = a.split('=')[-1].replace('"',"")
+                folder = a.split('=')[-1].replace('"', "")
                 folder = os.path.join(DEFAULT_NOTE_FOLDER, folder)
-                file_path = os.path.join((folder+'/'),file_name)
+                file_path = os.path.join((folder+'/'), file_name)
 
         if os.path.exists(file_path):
             os.system(f'{DEFAULT_EDITOR} {file_path}')
         else:
             error('dnt_exist')
 
-    
-
     def check_note_folder(self): return True if os.path.exists(
         DEFAULT_NOTE_FOLDER) else False
 
-    def get_help(self,args):
+    def get_help(self, args):
         print('============')
-        cprint('Noter command list', attrs=['bold','underline'])
+        cprint('Noter command list', attrs=['bold', 'underline'])
         print('============\n')
         for c in self.commands.keys():
-            print('• ',end='')
-            cprint(c,'green',end='')
+            print('• ', end='')
+            cprint(c, 'green', end='')
             for i in range(20-len(c)):
-                print(' ',end='')
-            print(self.commands_help[c]) 
+                print(' ', end='')
+            print(self.commands_help[c])
 
-    def error(self,err, help=False):
+    def error(self, err, help=False):
         cprint(self.error_list[err], 'red')
         if help:
             self.get_help()
 
-    def list_notes(self,args):
+    def list_notes(self, args):
         for root, dirs, files in os.walk(DEFAULT_NOTE_FOLDER):
             for file in files:
-                    _, path = os.path.join(root, file).split(DEFAULT_NOTE_FOLDER)
-                    print(path)
+                _, path = os.path.join(root, file).split(DEFAULT_NOTE_FOLDER)
+                print(path)
 
-    def create(self,args):
+    def create(self, args):
 
         file_name = args[-1]
         file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
         for a in args:
             if '--dir' in a:
-                folder = a.split('=')[-1].replace('"',"")
+                folder = a.split('=')[-1].replace('"', "")
                 folder = os.path.join(DEFAULT_NOTE_FOLDER, folder)
                 if not os.path.exists(folder):
                     os.mkdir(folder)
-                file_path = os.path.join((folder+'/'),file_name)
+                file_path = os.path.join((folder+'/'), file_name)
 
         print(file_path)
         if os.path.exists(file_path):

@@ -5,13 +5,15 @@ from termcolor import colored, cprint
 import os
 import sys
 import random
+from functools import lru_cache
+import config
 init()
 
 FILE_LOCATION = os.path.dirname(os.path.realpath(__file__))
 DEFAULT_NOTE_FOLDER = os.path.join(FILE_LOCATION, 'notes')
-DEFAULT_EDITOR = "code"
+DEFAULT_EDITOR = "notepad"
 
-
+@lru_cache
 class Note():
     def __init__(self):
         self.commands = {
@@ -28,7 +30,8 @@ class Note():
             'c': 'Shortcut for create',
             'create': 'Create file and open it with default editor; usage: $note create --dir="<dir>" <file.extension>',
             'o': 'Shortcut for open',
-            'open': 'Open existing note with default editor; usage: $note open --dir="<dir>" <file.extension>'
+            'open': 'Open existing note with default editor; usage: $note open --dir="<dir>" <file.extension>',
+            'list': 'Display note list'
         }
 
         self.error_list = {
@@ -45,7 +48,7 @@ class Note():
             if '--dir' in a:
                 folder = a.split('=')[-1].replace('"', "")
                 folder = os.path.join(DEFAULT_NOTE_FOLDER, folder)
-                file_path = os.path.join((folder+'/'), file_name)
+                file_path = os.path.join((folder), file_name)
 
         if os.path.exists(file_path):
             os.system(f'{DEFAULT_EDITOR} {file_path}')
@@ -55,7 +58,7 @@ class Note():
     def check_note_folder(self): return True if os.path.exists(
         DEFAULT_NOTE_FOLDER) else False
 
-    def get_help(self, args):
+    def get_help(self, *args):
         print('============')
         cprint('Noter command list', attrs=['bold', 'underline'])
         print('============\n')
@@ -87,7 +90,7 @@ class Note():
                 folder = os.path.join(DEFAULT_NOTE_FOLDER, folder)
                 if not os.path.exists(folder):
                     os.mkdir(folder)
-                file_path = os.path.join((folder+'/'), file_name)
+                file_path = os.path.join((folder), file_name)
 
         print(file_path)
         if os.path.exists(file_path):

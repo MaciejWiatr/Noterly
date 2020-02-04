@@ -21,5 +21,3 @@ def set_config(editor,folder):
         os.remove(filename)
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
-            
-set_config('notepad','None')

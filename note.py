@@ -1,33 +1,39 @@
 # -*- coding: utf-8 -*-
-
-from colorama import init
-from termcolor import colored, cprint
 import os
 import sys
-import random
 from functools import lru_cache
-import config
+from colorama import init
+from termcolor import cprint
+
 init()
 
 FILE_LOCATION = os.path.dirname(os.path.realpath(__file__))
 DEFAULT_NOTE_FOLDER = os.path.join(FILE_LOCATION, 'notes')
 DEFAULT_EDITOR = "notepad"
 
+
 @lru_cache
 class Note():
     def __init__(self):
         self.commands = {
             'help': self.get_help,
-            'c': self.create,
             'create': self.create,
             'o': self.open_file,
             'open': self.open_file,
             'list': self.list_notes
         }
 
+        self.opts = {
+            '--dir': None
+        }
+
+        self.aliases = {
+            'c': 'create',
+            'o': 'open'
+        }
+
         self.commands_help = {
             'help': 'Display all commands with their usage examples',
-            'c': 'Shortcut for create',
             'create': 'Create file and open it with default editor; usage: $note create --dir="<dir>" <file.extension>',
             'o': 'Shortcut for open',
             'open': 'Open existing note with default editor; usage: $note open --dir="<dir>" <file.extension>',
@@ -37,26 +43,26 @@ class Note():
         self.error_list = {
             'no_param': 'No parameters were given',
             'alrd_exist': 'The file that you want to create already exist\nUse "open" or "o" to open it',
-            'dnt_exist': 'That file doesnt exist'
+            'dnt_exist': 'That file doesnt exist',
+            "wrong_command": "Invalid command"
         }
 
     def open_file(self, args):
         file_name = args[-1]
-        file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
 
-        for a in args:
-            if '--dir' in a:
-                folder = a.split('=')[-1].replace('"', "")
-                folder = os.path.join(DEFAULT_NOTE_FOLDER, folder)
-                file_path = os.path.join((folder), file_name)
+        if self.opts['--dir']:
+            file_name = f"{self.opts['--dir']}\\{file_name}"
+
+        file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
 
         if os.path.exists(file_path):
             os.system(f'{DEFAULT_EDITOR} {file_path}')
         else:
-            error('dnt_exist')
+            self.error('dnt_exist')
 
-    def check_note_folder(self): return True if os.path.exists(
-        DEFAULT_NOTE_FOLDER) else False
+    def check_note_folder(self):
+        return True if os.path.exists(
+            DEFAULT_NOTE_FOLDER) else False
 
     def get_help(self, *args):
         print('============')
@@ -65,7 +71,7 @@ class Note():
         for c in self.commands.keys():
             print('• ', end='')
             cprint(c, 'green', end='')
-            for i in range(20-len(c)):
+            for i in range(20 - len(c)):
                 print(' ', end='')
             print(self.commands_help[c])
 
@@ -73,6 +79,7 @@ class Note():
         cprint(self.error_list[err], 'red')
         if help:
             self.get_help()
+        sys.exit()
 
     def list_notes(self, args):
         for root, dirs, files in os.walk(DEFAULT_NOTE_FOLDER):
@@ -83,32 +90,53 @@ class Note():
     def create(self, args):
 
         file_name = args[-1]
-        file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
-        for a in args:
-            if '--dir' in a:
-                folder = a.split('=')[-1].replace('"', "")
-                folder = os.path.join(DEFAULT_NOTE_FOLDER, folder)
-                if not os.path.exists(folder):
-                    os.mkdir(folder)
-                file_path = os.path.join((folder), file_name)
 
-        print(file_path)
+        if self.opts['--dir']:
+            folder = os.path.join(DEFAULT_NOTE_FOLDER, str(self.opts['--dir']))
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            file_name = f"{self.opts['--dir']}\\{file_name}"
+
+        file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
         if os.path.exists(file_path):
-            self.error('alrd_exist')
+            self.error('alrd_exist',help=True)
         else:
             open(f'{file_path}', 'x').close()
-            cprint(
-                f'File {file_name} was succesfully created in {file_path} :)', 'green')
-            os.system(f'{DEFAULT_EDITOR} {file_path}')
+        os.system(f'{DEFAULT_EDITOR} {file_path}')
+        cprint(
+            f'File {file_name} was succesfully created in {file_path} :)', 'green')
 
-    def main(self, sys_args):
+    def handle_aliases(self, command):
+        if command in self.aliases.keys():
+            return self.aliases[command]
+        else:
+            return command
+
+    def parse_opts(self, sys_args):
         try:
             _, command, *params = sys_args
         except Exception:
             self.error('no_param', help=True)
             sys.exit()
+        command = self.handle_aliases(command)
+        if command not in self.commands.keys():
+            self.error('wrong_command', help=True)
 
-        if self.check_note_folder() != True:
+        for param in params:
+            if "--" in param:
+                opt, val = param.split("=")
+                if opt in self.opts:
+                    self.opts[opt] = val
+
+        return [command, params]
+
+
+
+    def main(self, sys_args):
+        parsed = self.parse_opts(sys_args)
+        command = parsed[0]
+        params = parsed[1]
+        if not self.check_note_folder():
             os.mkdir(DEFAULT_NOTE_FOLDER)
         os.chdir(DEFAULT_NOTE_FOLDER)
         self.commands[command](params)

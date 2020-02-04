@@ -3,7 +3,7 @@
 
 
 > Note: Noter is currently in development and most of
-> its functions is not ready yet 
+> its functions are not ready yet 
 
 #### What is it?
 Noter is a CLI note app that lets you easly create and organize your notes without need to open third-party apps.

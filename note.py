@@ -18,7 +18,6 @@ class Note():
         self.commands = {
             'help': self.get_help,
             'create': self.create,
-            'o': self.open_file,
             'open': self.open_file,
             'list': self.list_notes
         }
@@ -35,7 +34,6 @@ class Note():
         self.commands_help = {
             'help': 'Display all commands with their usage examples',
             'create': 'Create file and open it with default editor; usage: $note create --dir="<dir>" <file.extension>',
-            'o': 'Shortcut for open',
             'open': 'Open existing note with default editor; usage: $note open --dir="<dir>" <file.extension>',
             'list': 'Display note list'
         }

@@ -4,6 +4,7 @@ import sys
 from functools import lru_cache
 from colorama import init
 from termcolor import cprint
+from tabulate import tabulate
 
 init()
 
@@ -28,7 +29,9 @@ class Note():
 
         self.aliases = {
             'c': 'create',
-            'o': 'open'
+            'o': 'open',
+            'l': 'list',
+            'h': 'help'
         }
 
         self.commands_help = {
@@ -63,15 +66,16 @@ class Note():
             DEFAULT_NOTE_FOLDER) else False
 
     def get_help(self, *args):
-        print('============')
-        cprint('Noter command list', attrs=['bold', 'underline'])
-        print('============\n')
-        for c in self.commands.keys():
-            print('• ', end='')
-            cprint(c, 'green', end='')
-            for i in range(20 - len(c)):
-                print(' ', end='')
-            print(self.commands_help[c])
+        commands = list(self.commands.keys())
+        descriptions = [self.commands_help[c] for c in commands]
+        aliases = []
+        for c in commands:
+            for alias, command in self.aliases.items():
+                if command == c:
+                    aliases.append(alias)
+        cprint(tabulate({"Command": commands,
+                         "Alias": aliases,
+                         "Description": descriptions}, headers="keys",), 'green')
 
     def error(self, err, help=False):
         cprint(self.error_list[err], 'red')
@@ -97,7 +101,7 @@ class Note():
 
         file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
         if os.path.exists(file_path):
-            self.error('alrd_exist',help=True)
+            self.error('alrd_exist', help=True)
         else:
             open(f'{file_path}', 'x').close()
         os.system(f'{DEFAULT_EDITOR} {file_path}')
@@ -127,8 +131,6 @@ class Note():
                     self.opts[opt] = val
 
         return [command, params]
-
-
 
     def main(self, sys_args):
         parsed = self.parse_opts(sys_args)

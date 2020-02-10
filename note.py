@@ -16,6 +16,9 @@ DEFAULT_EDITOR = "notepad"
 @lru_cache
 class Note():
     def __init__(self):
+        """
+        Main noter module
+        """
         self.commands = {
             'help': self.get_help,
             'create': self.create,
@@ -61,7 +64,8 @@ class Note():
         else:
             self.error('dnt_exist')
 
-    def check_note_folder(self):
+    @staticmethod
+    def check_note_folder():
         return True if os.path.exists(
             DEFAULT_NOTE_FOLDER) else False
 
@@ -83,8 +87,9 @@ class Note():
             self.get_help()
         sys.exit()
 
-    def list_notes(self, args):
-        for root, dirs, files in os.walk(DEFAULT_NOTE_FOLDER):
+    @staticmethod
+    def list_notes(args):
+        for root, _, files in os.walk(DEFAULT_NOTE_FOLDER):
             for file in files:
                 _, path = os.path.join(root, file).split(DEFAULT_NOTE_FOLDER)
                 print(path)

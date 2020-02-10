@@ -17,7 +17,7 @@ DEFAULT_EDITOR = "notepad"
 class Note():
     def __init__(self):
         """
-        Main noter module
+        Main noter module.
         """
         self.commands = {
             'help': self.get_help,

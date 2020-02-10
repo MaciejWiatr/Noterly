@@ -16,9 +16,7 @@ DEFAULT_EDITOR = "notepad"
 @lru_cache
 class Note():
     def __init__(self):
-        """
-        Main noter module.
-        """
+        """Main noter module."""
         self.commands = {
             'help': self.get_help,
             'create': self.create,

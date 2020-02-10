@@ -8,10 +8,6 @@ from tabulate import tabulate
 
 init()
 
-FILE_LOCATION = os.path.dirname(os.path.realpath(__file__))
-DEFAULT_NOTE_FOLDER = os.path.join(FILE_LOCATION, 'notes')
-DEFAULT_EDITOR = "notepad"
-
 
 @lru_cache
 class Note():
@@ -49,23 +45,26 @@ class Note():
             "wrong_command": "Invalid command"
         }
 
+        self.FILE_LOCATION = os.path.dirname(os.path.realpath(__file__))
+        self.DEFAULT_NOTE_FOLDER = os.path.join(self.FILE_LOCATION, 'notes')
+        self.DEFAULT_EDITOR = "notepad"
+
     def open_file(self, args):
         file_name = args[-1]
 
         if self.opts['--dir']:
             file_name = f"{self.opts['--dir']}\\{file_name}"
 
-        file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
+        file_path = os.path.join(self.DEFAULT_NOTE_FOLDER, file_name)
 
         if os.path.exists(file_path):
-            os.system(f'{DEFAULT_EDITOR} {file_path}')
+            os.system(f'{self.DEFAULT_EDITOR} {file_path}')
         else:
             self.error('dnt_exist')
 
-    @staticmethod
-    def check_note_folder():
+    def check_note_folder(self):
         return True if os.path.exists(
-            DEFAULT_NOTE_FOLDER) else False
+            self.DEFAULT_NOTE_FOLDER) else False
 
     def get_help(self, *args):
         commands = list(self.commands.keys())
@@ -85,11 +84,11 @@ class Note():
             self.get_help()
         sys.exit()
 
-    @staticmethod
-    def list_notes(args):
-        for root, _, files in os.walk(DEFAULT_NOTE_FOLDER):
+    def list_notes(self, args):
+        for root, _, files in os.walk(self.DEFAULT_NOTE_FOLDER):
             for file in files:
-                _, path = os.path.join(root, file).split(DEFAULT_NOTE_FOLDER)
+                _, path = os.path.join(root, file).split(
+                    self.DEFAULT_NOTE_FOLDER)
                 print(path)
 
     def create(self, args):
@@ -97,19 +96,22 @@ class Note():
         file_name = args[-1]
 
         if self.opts['--dir']:
-            folder = os.path.join(DEFAULT_NOTE_FOLDER, str(self.opts['--dir']))
+            folder = os.path.join(self.DEFAULT_NOTE_FOLDER,
+                                  str(self.opts['--dir']))
             if not os.path.exists(folder):
                 os.mkdir(folder)
             file_name = f"{self.opts['--dir']}\\{file_name}"
 
-        file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
+        file_path = os.path.join(self.DEFAULT_NOTE_FOLDER, file_name)
         if os.path.exists(file_path):
             self.error('alrd_exist', get_help=True)
         else:
             open(f'{file_path}', 'x').close()
-        os.system(f'{DEFAULT_EDITOR} {file_path}')
+        os.system(f'{self.DEFAULT_EDITOR} {file_path}')
         cprint(
             f'File {file_name} was succesfully created in {file_path} :)', 'green')
+
+        return 'created'
 
     def handle_aliases(self, command):
         if command in self.aliases.keys():
@@ -140,8 +142,8 @@ class Note():
         command = parsed[0]
         params = parsed[1]
         if not self.check_note_folder():
-            os.mkdir(DEFAULT_NOTE_FOLDER)
-        os.chdir(DEFAULT_NOTE_FOLDER)
+            os.mkdir(self.DEFAULT_NOTE_FOLDER)
+        os.chdir(self.DEFAULT_NOTE_FOLDER)
         self.commands[command](params)
 
 

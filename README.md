@@ -5,13 +5,13 @@
 > Note: Noter is currently in development and most of
 > its functions are not ready yet
 
-## What is it?
+## What is it
 
 Noter is a CLI note app that lets you easly create and organize your notes without need to open third-party apps.
 
-## Why is it cool?
+## Why is it cool
 
-```
+```sh
 ¯\_(ツ)_/¯
 ```
 

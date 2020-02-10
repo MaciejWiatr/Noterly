@@ -1,5 +1,7 @@
 # Noter 📓
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/eb3248ca9e5e4608bf2fe88df8b0e457)](https://app.codacy.com/manual/MaciejWiatr/Noter?utm_source=github.com&utm_medium=referral&utm_content=MaciejWiatr/Noter&utm_campaign=Badge_Grade_Dashboard)
+
 ---
 
 > Note: Noter is currently in development and most of

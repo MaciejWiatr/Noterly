@@ -16,6 +16,7 @@ DEFAULT_EDITOR = "notepad"
 @lru_cache
 class Note():
     def __init__(self):
+        """Main noter module."""
         self.commands = {
             'help': self.get_help,
             'create': self.create,
@@ -61,7 +62,8 @@ class Note():
         else:
             self.error('dnt_exist')
 
-    def check_note_folder(self):
+    @staticmethod
+    def check_note_folder():
         return True if os.path.exists(
             DEFAULT_NOTE_FOLDER) else False
 
@@ -77,14 +79,15 @@ class Note():
                          "Alias": aliases,
                          "Description": descriptions}, headers="keys",), 'green')
 
-    def error(self, err, help=False):
+    def error(self, err, get_help=False):
         cprint(self.error_list[err], 'red')
-        if help:
+        if get_help:
             self.get_help()
         sys.exit()
 
-    def list_notes(self, args):
-        for root, dirs, files in os.walk(DEFAULT_NOTE_FOLDER):
+    @staticmethod
+    def list_notes(args):
+        for root, _, files in os.walk(DEFAULT_NOTE_FOLDER):
             for file in files:
                 _, path = os.path.join(root, file).split(DEFAULT_NOTE_FOLDER)
                 print(path)
@@ -101,7 +104,7 @@ class Note():
 
         file_path = os.path.join(DEFAULT_NOTE_FOLDER, file_name)
         if os.path.exists(file_path):
-            self.error('alrd_exist', help=True)
+            self.error('alrd_exist', get_help=True)
         else:
             open(f'{file_path}', 'x').close()
         os.system(f'{DEFAULT_EDITOR} {file_path}')
@@ -118,11 +121,11 @@ class Note():
         try:
             _, command, *params = sys_args
         except Exception:
-            self.error('no_param', help=True)
+            self.error('no_param', get_help=True)
             sys.exit()
         command = self.handle_aliases(command)
         if command not in self.commands.keys():
-            self.error('wrong_command', help=True)
+            self.error('wrong_command', get_help=True)
 
         for param in params:
             if "--" in param:

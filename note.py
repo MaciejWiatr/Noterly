@@ -111,7 +111,7 @@ class Note():
         cprint(
             f'File {file_name} was succesfully created in {file_path} :)', 'green')
 
-        return 'created'
+        return 'ok'
 
     def handle_aliases(self, command):
         if command in self.aliases.keys():

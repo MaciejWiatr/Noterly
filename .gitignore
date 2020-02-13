@@ -5,3 +5,5 @@ notes/
 noter/
 .vscode/
 env/
+__pycache__/
+__pycache__/note.cpython-38.pyc
